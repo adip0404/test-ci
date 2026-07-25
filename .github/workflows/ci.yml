@@ -1,29 +1,35 @@
-name: Simple CI
+name: Python CI
 
 on:
   push:
-    branches:
-      - main
-      - master
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show environment
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
         run: |
-          echo "CI is running!"
-          echo "Repository: ${{ github.repository }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
+          python -m pip install --upgrade pip
+          pip install pytest
 
-      - name: Fail test
-        run: exit 1
+      - name: Lint source
+        run: |
+          python -m py_compile calculator.py
 
-      - name: Success
-        run: echo "✅ CI completed successfully"
+      - name: Run tests
+        run: |
+          pytest -v
