@@ -22,5 +22,8 @@ jobs:
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
 
+      - name: Fail test
+        run: exit 1
+
       - name: Success
         run: echo "✅ CI completed successfully"
